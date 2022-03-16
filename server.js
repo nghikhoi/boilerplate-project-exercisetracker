@@ -57,6 +57,13 @@ app.route('/api/users/:_id/exercises')
 
 app.route('/api/users/:_id/logs')
     .get((req, res) => {
+      var from = req.query.from
+      var to = req.query.to
+      var limit = req.query.limit
+
+      console.log(`${from} && ${to} && ${limit} && ${req.query}`)
+      console.log(`${!from}`)
+
       var id = req.params._id
       var user = userSearchById(id)
       if (!user) {
@@ -65,28 +72,25 @@ app.route('/api/users/:_id/logs')
       }
       var log = exerciseSearchById(id)
 
-      var from = req.query.from
-      var to = req.query.to
-      var limit = req.query.limit
       var result = {
         username: user.username,
         count: log.length,
         _id: user.id
       }
 
-      if (!from) {
+      if (from) {
         var fromTime = Date.parse(from)
         log = log.filter(l => l.date >= fromTime)
         result.from = new Date(fromTime).toDateString()
       }
 
-      if (!to) {
+      if (to) {
         var toTime = Date.parse(to)
         log = log.filter(l => l.date <= toTime)
         result.to = new Date(toTime).toDateString()
       }
 
-      if (!limit && !isNaN(limit)) {
+      if (limit && !isNaN(limit)) {
         var limitNumber = parseInt(limit)
         log = log.slice(0, limit)
       }
